@@ -43,6 +43,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <wiringPi.h>
 
 #include "config.h"
 
@@ -1987,6 +1988,10 @@ static void *rtsp_conversation_thread_func(void *pconn) {
     pthread_mutex_unlock(&play_lock);
   }
   debug(2, "Connection %d: RTSP thread terminated.", conn->connection_number);
+  // wiringPi gpio set pin low
+  digitalWrite(WIRINGPI_PIN,LOW);
+  debug(2, "Connection terminated, gpio set pin %d low.", WIRINGPI_PIN);
+
   conn->running = 0;
 
   // release the player_thread_lock
@@ -2158,6 +2163,7 @@ void rtsp_listen_loop(void) {
       socklen_t size_of_reply = sizeof(*local_info);
       memset(local_info, 0, sizeof(SOCKADDR));
       if (getsockname(conn->fd, (struct sockaddr *)local_info, &size_of_reply) == 0) {
+        
 
         // IPv4:
         if (local_info->SAFAMILY == AF_INET) {
@@ -2171,6 +2177,9 @@ void rtsp_listen_loop(void) {
           unsigned short int rport = ntohs(sa->sin_port);
           debug(2, "New RTSP connection from %s:%u to self at %s:%u on conversation thread %d.",
                 remote_ip4, rport, ip4, tport, conn->connection_number);
+          // wiringPi gpio set pin high
+          digitalWrite(WIRINGPI_PIN,HIGH);
+          debug(2, "New RTSP connection, gpio set pin %d high.", WIRINGPI_PIN);
         }
 #ifdef AF_INET6
         if (local_info->SAFAMILY == AF_INET6) {
@@ -2188,6 +2197,9 @@ void rtsp_listen_loop(void) {
           u_int16_t rport = ntohs(sa6->sin6_port);
           debug(2, "New RTSP connection from [%s]:%u to self at [%s]:%u on conversation thread %d.",
                 remote_ip6, rport, ip6, tport, conn->connection_number);
+          // wiringPi gpio set pin high
+          digitalWrite(WIRINGPI_PIN,HIGH);
+          debug(2, "New RTSP connection, gpio set pin %d high.", WIRINGPI_PIN);
         }
 #endif
 

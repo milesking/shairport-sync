@@ -202,6 +202,14 @@ AC_ARG_WITH(tinysvcmdns, [  --with-tinysvcmdns = choose tinysvcmdns-based mDNS s
   AC_DEFINE([CONFIG_TINYSVCMDNS], 1, [Needed by the compiler.])], )
 AM_CONDITIONAL([USE_TINYSVCMDNS], [test "x$HAS_TINYSVCMDNS" = "x1"])
 
+# Look for wiringPi flag
+AC_ARG_WITH(wiringPi, [  --with-wiringPi = choose wiringPi support], [
+  AC_MSG_RESULT(>>Including wiringPi support)
+  WIRINGPI_LIBS="-lwiringPi"
+  AC_DEFINE([WIRINGPI_PIN], 1, [Needed by the compiler.])], )
+  LIBS="${WIRINGPI_LIBS} ${LIBS}"
+AM_CONDITIONAL([USE_WIRINGPI], [test "x$HAS_WIRINGPI" = "x1"])
+
 # Look for ALSA flag
 AC_ARG_WITH(alsa, [  --with-alsa = choose ALSA API support (GNU/Linux only)],
   [AC_MSG_RESULT(>>Including an ALSA back end)
