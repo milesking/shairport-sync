@@ -41,7 +41,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <wiringPi.h>
 
 #include "config.h"
 
@@ -1508,10 +1507,8 @@ int main(int argc, char **argv) {
   start_mpris_service();
 #endif
 #endif
-  //init wiringPi
-  wiringPiSetup();
-  pinMode(WIRINGPI_PIN,OUTPUT);
-  debug(2, "Init wiringPi on pin %d.", WIRINGPI_PIN);
+
+  init_wiringpi();
   // daemon_log(LOG_INFO, "Successful Startup");
   rtsp_listen_loop();
 

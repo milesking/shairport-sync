@@ -2022,6 +2022,13 @@ static const char *format_address(struct sockaddr *fsa) {
 }
 */
 
+void init_wiringpi(void) {
+  //init wiringPi
+  wiringPiSetup();
+  pinMode(WIRINGPI_PIN,OUTPUT);
+  debug(2, "Init wiringPi on pin %d.", WIRINGPI_PIN);
+}
+
 void rtsp_listen_loop(void) {
   struct addrinfo hints, *info, *p;
   char portstr[6];
