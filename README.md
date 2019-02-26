@@ -1,3 +1,77 @@
+树莓派 Airplay Airport 插件 gpio 控制 继电器 raspberry pi relay mod 
+=============
+
+前言
+----------
+Repo forked from [mikebrady/shairport-sync](https://github.com/mikebrady/shairport-sync)。
+本人只是简单的加了在Airplay播放的时候控制继电器通，暂停或者Airplay断开的时候控制通电器断的代码，来实现音箱220v电源的智能开关。
+PS：代码还没上传，本地环境的编译安装没有问题，可能别人下载下来会有问题，这两天就会上传。
+
+安装
+----------
+
+**本项目依赖wiringPi控制GPIO**
+
+安装git依赖
+```
+sudo apt-get install git-core
+```
+更新源
+```
+sudo apt-get update
+sudo apt-get upgrade
+```
+克隆仓库然后build，会自动安装wiringPi
+```
+git clone git://git.drogon.net/wiringPi
+cd wiringPi
+./build
+```
+运行gpio readall就能看到物理端口对应的gpio端口了
+
+**安装shairport-sync**
+
+安装依赖
+```
+sudo apt-get install build-essential git autoconf libtool libdaemon-dev libasound2-dev libpopt-dev libconfig-dev avahi-daemon libavahi-client-dev libssl-dev
+```
+克隆本仓库并生成configure文件
+```
+git clone git@github.com:milesking/shairport-sync.git
+cd shairport-sync && autoreconf -i -f
+```
+运行configure
+```
+./configure --with-alsa --with-stdout --with-pipe --with-avahi --with-ssl=openssl --with-metadata --with-systemd --with-wiringPi
+```
+运行make安装
+```
+make
+sudo make install
+```
+配置自动启动服务
+```
+systemctl enable shairport-sync
+systemctl start shairport-sync
+```
+启动失败及解决办法
+```
+systemctl status shairport-sync
+查看服务状态，如果不是active
+sudo vi /lib/systemd/system/shairport-sync.service
+把user和group改成当前用户的user和group（手动添加该user和group也可以）
+systemctl start shairport-sync
+```
+
+**将继电器接到gpio pin**
+
+ 代码里面写死了使用gpio pin 1 对应树莓派2b+就是物理 pin 12。
+ 继电器的acc接物理pin 1，继电器的gnd接物理 pin 14， 继电器in接物理12。220v火线接到继电器两个端口。
+ 测试连上airplay自动打开继电器，暂停几秒钟或者断开airplay继电器断开。
+
+Origin Readme
+=============
+
 Shairport Sync
 =============
 Shairport Sync is an AirPlay audio player – it plays audio streamed from iTunes, iOS, Apple TV and macOS devices and AirPlay sources such as Quicktime Player and [ForkedDaapd](http://ejurgensen.github.io/forked-daapd/), among others.
