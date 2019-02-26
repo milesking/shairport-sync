@@ -5,7 +5,6 @@
 ----------
 Repo forked from [mikebrady/shairport-sync](https://github.com/mikebrady/shairport-sync)。
 本人只是简单的加了在Airplay播放的时候控制继电器通，暂停或者Airplay断开的时候控制通电器断的代码，来实现音箱220v电源的智能开关。
-PS：代码还没上传，本地环境的编译安装没有问题，可能别人下载下来会有问题，这两天就会上传。
 
 安装
 ----------
@@ -28,6 +27,34 @@ cd wiringPi
 ./build
 ```
 运行gpio readall就能看到物理端口对应的gpio端口了
+```
+ +-----+-----+---------+------+---+---Pi 2---+---+------+---------+-----+-----+
+ | BCM | wPi |   Name  | Mode | V | Physical | V | Mode | Name    | wPi | BCM |
+ +-----+-----+---------+------+---+----++----+---+------+---------+-----+-----+
+ |     |     |    3.3v |      |   |  1 || 2  |   |      | 5v      |     |     |
+ |   2 |   8 |   SDA.1 |   IN | 1 |  3 || 4  |   |      | 5v      |     |     |
+ |   3 |   9 |   SCL.1 |   IN | 1 |  5 || 6  |   |      | 0v      |     |     |
+ |   4 |   7 | GPIO. 7 |   IN | 1 |  7 || 8  | 1 | ALT0 | TxD     | 15  | 14  |
+ |     |     |      0v |      |   |  9 || 10 | 1 | ALT0 | RxD     | 16  | 15  |
+ |  17 |   0 | GPIO. 0 |   IN | 0 | 11 || 12 | 1 | OUT  | GPIO. 1 | 1   | 18  |
+ |  27 |   2 | GPIO. 2 |   IN | 0 | 13 || 14 |   |      | 0v      |     |     |
+ |  22 |   3 | GPIO. 3 |   IN | 0 | 15 || 16 | 0 | IN   | GPIO. 4 | 4   | 23  |
+ |     |     |    3.3v |      |   | 17 || 18 | 0 | IN   | GPIO. 5 | 5   | 24  |
+ |  10 |  12 |    MOSI |   IN | 0 | 19 || 20 |   |      | 0v      |     |     |
+ |   9 |  13 |    MISO |   IN | 0 | 21 || 22 | 0 | IN   | GPIO. 6 | 6   | 25  |
+ |  11 |  14 |    SCLK |   IN | 0 | 23 || 24 | 1 | IN   | CE0     | 10  | 8   |
+ |     |     |      0v |      |   | 25 || 26 | 1 | IN   | CE1     | 11  | 7   |
+ |   0 |  30 |   SDA.0 |   IN | 1 | 27 || 28 | 1 | IN   | SCL.0   | 31  | 1   |
+ |   5 |  21 | GPIO.21 |   IN | 1 | 29 || 30 |   |      | 0v      |     |     |
+ |   6 |  22 | GPIO.22 |   IN | 1 | 31 || 32 | 0 | IN   | GPIO.26 | 26  | 12  |
+ |  13 |  23 | GPIO.23 |   IN | 0 | 33 || 34 |   |      | 0v      |     |     |
+ |  19 |  24 | GPIO.24 |   IN | 0 | 35 || 36 | 0 | IN   | GPIO.27 | 27  | 16  |
+ |  26 |  25 | GPIO.25 |   IN | 0 | 37 || 38 | 0 | IN   | GPIO.28 | 28  | 20  |
+ |     |     |      0v |      |   | 39 || 40 | 0 | IN   | GPIO.29 | 29  | 21  |
+ +-----+-----+---------+------+---+----++----+---+------+---------+-----+-----+
+ | BCM | wPi |   Name  | Mode | V | Physical | V | Mode | Name    | wPi | BCM |
+ +-----+-----+---------+------+---+---Pi 2---+---+------+---------+-----+-----+
+```
 
 **安装shairport-sync**
 
@@ -35,6 +62,17 @@ cd wiringPi
 ```
 sudo apt-get install build-essential git autoconf libtool libdaemon-dev libasound2-dev libpopt-dev libconfig-dev avahi-daemon libavahi-client-dev libssl-dev
 ```
+默认gpio端口1，可在configure.ac修改WIRINGPI_PIN,后面的数字
+```
+# Look for wiringPi flag
+AC_ARG_WITH(wiringPi, [  --with-wiringPi = choose wiringPi support], [
+  AC_MSG_RESULT(>>Including wiringPi support)
+  WIRINGPI_LIBS="-lwiringPi"
+  AC_DEFINE([WIRINGPI_PIN], 1, [Needed by the compiler.])], )
+  LIBS="${WIRINGPI_LIBS} ${LIBS}"
+AM_CONDITIONAL([USE_WIRINGPI], [test "x$HAS_WIRINGPI" = "x1"])
+```
+
 克隆本仓库并生成configure文件
 ```
 git clone git@github.com:milesking/shairport-sync.git
